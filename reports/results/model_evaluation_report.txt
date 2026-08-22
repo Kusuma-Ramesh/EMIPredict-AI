@@ -1,0 +1,32 @@
+EMIPredict AI - MODEL EVALUATION REPORT
+======================================================================
+
+CLASSIFICATION MODEL
+----------------------------------------------------------------------
+Accuracy       : 0.9203
+Macro F1       : 0.8024
+Weighted F1    : 0.9365
+
+              precision    recall  f1-score   support
+
+    Eligible     0.9833    0.8864    0.9324     14889
+   High_Risk     0.3517    0.9525    0.5137      3497
+Not_Eligible     0.9985    0.9265    0.9611     62574
+
+    accuracy                         0.9203     80960
+   macro avg     0.7778    0.9218    0.8024     80960
+weighted avg     0.9677    0.9203    0.9365     80960
+
+
+REGRESSION MODEL
+----------------------------------------------------------------------
+MAE  : ₹276.43
+RMSE : ₹663.51
+R²   : 0.9927
+
+RESIDUAL SUMMARY
+----------------------------------------------------------------------
+Mean residual       : ₹-4.79
+Median residual     : ₹-1.11
+Mean absolute error : ₹276.43
+Maximum error       : ₹25,694.75

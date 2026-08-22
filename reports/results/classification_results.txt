@@ -1,0 +1,33 @@
+EMIPredict AI - EMI Eligibility Classification Results
+======================================================================
+
+Training samples : 323,840
+Testing samples  : 80,960
+
+Number of features : 33
+Numerical features : 25
+Categorical features : 8
+
+Accuracy       : 0.9203
+Macro F1 Score : 0.8024
+Weighted F1    : 0.9365
+
+Classification Report
+----------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+Not_Eligible     0.9985    0.9265    0.9611     62574
+    Eligible     0.9833    0.8864    0.9324     14889
+   High_Risk     0.3517    0.9525    0.5137      3497
+
+    accuracy                         0.9203     80960
+   macro avg     0.7778    0.9218    0.8024     80960
+weighted avg     0.9677    0.9203    0.9365     80960
+
+
+Confusion Matrix
+----------------------------------------------------------------------
+                     Pred_Not_Eligible  Pred_Eligible  Pred_High_Risk
+Actual_Not_Eligible              57976            112            4486
+Actual_Eligible                     36          13198            1655
+Actual_High_Risk                    54            112            3331

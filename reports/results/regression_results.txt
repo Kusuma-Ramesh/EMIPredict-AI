@@ -1,0 +1,13 @@
+EMIPredict AI - EMI Amount Regression Results
+======================================================================
+
+Training samples : 323,840
+Testing samples  : 80,960
+
+Number of features : 33
+Numerical features : 25
+Categorical features : 8
+
+MAE  : ₹276.43
+RMSE : ₹663.51
+R²   : 0.9927
