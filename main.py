@@ -1,8 +1,9 @@
 from pathlib import Path
 import sys
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
 
 
 # ============================================================
@@ -15,6 +16,26 @@ SRC_DIR = PROJECT_ROOT / "src"
 
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
+
+
+# ============================================================
+# DATABASE / CRUD
+# ============================================================
+
+from database.database import get_db
+from schemas.customer import (
+    CustomerCreate,
+    CustomerUpdate,
+    CustomerResponse,
+)
+
+from services.customer_service import (
+    create_customer,
+    get_customers,
+    get_customer,
+    update_customer,
+    delete_customer,
+)
 
 
 # ============================================================
@@ -173,22 +194,120 @@ def health_check():
 # ============================================================
 
 @app.post("/predict")
-def predict(request: EMIPredictionRequest):
+def predict(
+    request: EMIPredictionRequest,
+    db: Session = Depends(get_db),
+):
 
     try:
 
         customer_data = request.model_dump()
 
+        # ----------------------------------------------------
+        # RUN ML PREDICTION
+        # ----------------------------------------------------
+
         result = predict_emi(
             customer_data
         )
 
+        # ----------------------------------------------------
+        # SAVE CUSTOMER
+        # ----------------------------------------------------
+
+        customer = Customer(
+            **customer_data
+        )
+
+        db.add(customer)
+        db.commit()
+        db.refresh(customer)
+
+        # ----------------------------------------------------
+        # EXTRACT PREDICTION VALUES
+        # ----------------------------------------------------
+
+        probabilities = result.get(
+            "eligibility_probabilities",
+            {}
+        )
+
+        emi_status = result.get(
+            "emi_eligibility",
+            "Unknown"
+        )
+
+        predicted_max_emi = result.get(
+            "predicted_max_monthly_emi",
+            0
+        )
+
+        recommendation = result.get(
+            "recommendation",
+            ""
+        )
+
+        # ----------------------------------------------------
+        # CALCULATE REQUESTED MONTHLY EMI
+        # ----------------------------------------------------
+
+        requested_amount = request.requested_amount
+        requested_tenure = request.requested_tenure
+
+        requested_monthly_emi = (
+            requested_amount / requested_tenure
+        )
+
+        # ----------------------------------------------------
+        # SAVE PREDICTION
+        # ----------------------------------------------------
+
+        prediction_record = Prediction(
+            customer_id=customer.id,
+
+            emi_status=emi_status,
+
+            not_eligible_probability=probabilities.get(
+                "Not_Eligible",
+                0
+            ),
+
+            eligible_probability=probabilities.get(
+                "Eligible",
+                0
+            ),
+
+            high_risk_probability=probabilities.get(
+                "High_Risk",
+                0
+            ),
+
+            predicted_max_monthly_emi=predicted_max_emi,
+
+            requested_monthly_emi=requested_monthly_emi,
+
+            recommendation=recommendation,
+        )
+
+        db.add(prediction_record)
+
+        db.commit()
+
+        db.refresh(prediction_record)
+
+        # ----------------------------------------------------
+        # RETURN RESULT
+        # ----------------------------------------------------
+
         return {
             "success": True,
+            "customer_id": customer.id,
             "prediction": result,
         }
 
     except Exception as error:
+
+        db.rollback()
 
         raise HTTPException(
             status_code=500,
@@ -197,3 +316,112 @@ def predict(request: EMIPredictionRequest):
                 f"{str(error)}"
             ),
         )
+# ============================================================
+# CUSTOMER CRUD ENDPOINTS
+# ============================================================
+
+@app.post(
+    "/customers",
+    response_model=CustomerResponse,
+    status_code=201,
+)
+def create_customer_endpoint(
+    customer_data: CustomerCreate,
+    db: Session = Depends(get_db),
+):
+    return create_customer(
+        db,
+        customer_data,
+    )
+
+
+@app.get(
+    "/customers",
+    response_model=list[CustomerResponse],
+)
+def get_customers_endpoint(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+):
+    return get_customers(
+        db,
+        skip,
+        limit,
+    )
+
+
+@app.get(
+    "/customers/{customer_id}",
+    response_model=CustomerResponse,
+)
+def get_customer_endpoint(
+    customer_id: int,
+    db: Session = Depends(get_db),
+):
+    customer = get_customer(
+        db,
+        customer_id,
+    )
+
+    if customer is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Customer not found",
+        )
+
+    return customer
+
+
+@app.put(
+    "/customers/{customer_id}",
+    response_model=CustomerResponse,
+)
+def update_customer_endpoint(
+    customer_id: int,
+    customer_data: CustomerUpdate,
+    db: Session = Depends(get_db),
+):
+    customer = get_customer(
+        db,
+        customer_id,
+    )
+
+    if customer is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Customer not found",
+        )
+
+    return update_customer(
+        db,
+        customer,
+        customer_data,
+    )
+
+
+@app.delete(
+    "/customers/{customer_id}",
+    status_code=204,
+)
+def delete_customer_endpoint(
+    customer_id: int,
+    db: Session = Depends(get_db),
+):
+    customer = get_customer(
+        db,
+        customer_id,
+    )
+
+    if customer is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Customer not found",
+        )
+
+    delete_customer(
+        db,
+        customer,
+    )
+
+    return None

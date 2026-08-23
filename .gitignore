@@ -1,12 +1,15 @@
 .venv/
 __pycache__/
-.pytest_cache/
-.idea/
 *.pyc
+.idea/
+.vscode/
+.env
+*.log
 
-mlflow.db
-mlruns/
-mlartifacts/
+# Temporary files
+*.tmp
+*.bak
 
-data/raw/
-data/processed/
+# OS files
+.DS_Store
+Thumbs.db
