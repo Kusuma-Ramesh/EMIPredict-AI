@@ -13,3 +13,17 @@ __pycache__/
 # OS files
 .DS_Store
 Thumbs.db
+# Local data / generated artifacts
+data/emipredict.db
+data/raw/
+data/processed/
+mlartifacts/
+mlflow.db
+
+# Frontend dependencies / build output
+emipredict-frontend/node_modules/
+emipredict-frontend/dist/
+
+# Frontend environment
+emipredict-frontend/.env
+emipredict-frontend/.env.*
