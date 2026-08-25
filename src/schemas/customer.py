@@ -88,3 +88,18 @@ class CustomerResponse(CustomerBase):
     model_config = ConfigDict(
         from_attributes=True
     )
+class PredictionResponse(BaseModel):
+    prediction_id: int
+    customer_id: int | None = None
+
+    emi_status: str
+
+    probability_not_eligible: float | None = None
+    probability_eligible: float | None = None
+    probability_high_risk: float | None = None
+
+    max_recommended_emi: float | None = None
+    requested_emi: float | None = None
+
+    recommendation: str | None = None
+    created_at: datetime

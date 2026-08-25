@@ -23,12 +23,13 @@ if str(SRC_DIR) not in sys.path:
 # ============================================================
 
 from database.database import get_db
+from database.models import Customer, Prediction
 from schemas.customer import (
     CustomerCreate,
     CustomerUpdate,
     CustomerResponse,
+    PredictionResponse,
 )
-
 from services.customer_service import (
     create_customer,
     get_customers,
@@ -316,6 +317,72 @@ def predict(
                 f"{str(error)}"
             ),
         )
+# ============================================================
+# PREDICTION HISTORY ENDPOINTS
+# ============================================================
+
+@app.get(
+    "/predictions",
+    response_model=list[PredictionResponse],
+)
+def get_predictions_endpoint(
+    db: Session = Depends(get_db),
+):
+    predictions = (
+        db.query(Prediction)
+        .order_by(Prediction.created_at.desc())
+        .all()
+    )
+
+    return [
+        PredictionResponse(
+            prediction_id=prediction.id,
+            customer_id=prediction.customer_id,
+            emi_status=prediction.emi_status,
+            probability_not_eligible=prediction.not_eligible_probability,
+            probability_eligible=prediction.eligible_probability,
+            probability_high_risk=prediction.high_risk_probability,
+            max_recommended_emi=prediction.predicted_max_monthly_emi,
+            requested_emi=prediction.requested_monthly_emi,
+            recommendation=prediction.recommendation,
+            created_at=prediction.created_at,
+        )
+        for prediction in predictions
+    ]
+
+
+@app.get(
+    "/predictions/{prediction_id}",
+    response_model=PredictionResponse,
+)
+def get_prediction_endpoint(
+    prediction_id: int,
+    db: Session = Depends(get_db),
+):
+    prediction = (
+        db.query(Prediction)
+        .filter(Prediction.id == prediction_id)
+        .first()
+    )
+
+    if prediction is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Prediction not found",
+        )
+
+    return PredictionResponse(
+        prediction_id=prediction.id,
+        customer_id=prediction.customer_id,
+        emi_status=prediction.emi_status,
+        probability_not_eligible=prediction.not_eligible_probability,
+        probability_eligible=prediction.eligible_probability,
+        probability_high_risk=prediction.high_risk_probability,
+        max_recommended_emi=prediction.predicted_max_monthly_emi,
+        requested_emi=prediction.requested_monthly_emi,
+        recommendation=prediction.recommendation,
+        created_at=prediction.created_at,
+    )
 # ============================================================
 # CUSTOMER CRUD ENDPOINTS
 # ============================================================
