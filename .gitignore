@@ -27,3 +27,5 @@ emipredict-frontend/dist/
 # Frontend environment
 emipredict-frontend/.env
 emipredict-frontend/.env.*
+!emipredict-frontend/
+!emipredict-frontend/dist/

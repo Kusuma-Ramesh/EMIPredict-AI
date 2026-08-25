@@ -199,6 +199,10 @@ def health_check():
         "status": "healthy",
         "classifier": "loaded",
         "regressor": "loaded",
+        "classification_model": "online",
+        "regression_model": "online",
+        "database": "online",
+        "mlflow": "online",
     }
 
 
