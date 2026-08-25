@@ -23,7 +23,7 @@ if str(SRC_DIR) not in sys.path:
 # DATABASE / CRUD
 # ============================================================
 
-from database.database import get_db
+from database.database import Base, engine, get_db
 from database.models import Customer, Prediction
 from schemas.customer import (
     CustomerCreate,
@@ -38,7 +38,11 @@ from services.customer_service import (
     update_customer,
     delete_customer,
 )
+# ============================================================
+# DATABASE INITIALIZATION
+# ============================================================
 
+Base.metadata.create_all(bind=engine)
 
 # ============================================================
 # PREDICTION SERVICE
