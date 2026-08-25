@@ -2,6 +2,7 @@ from pathlib import Path
 import sys
 
 from fastapi import FastAPI, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -57,6 +58,13 @@ app = FastAPI(
         "monthly EMI prediction API."
     ),
     version="1.0.0",
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
