@@ -73,10 +73,10 @@ The overall workflow is:
 Applicant Financial Profile
             |
             v
-     Input Validation
+      Input Validation
             |
             v
-   Data Preprocessing
+     Data Preprocessing
             |
             +----------------------+
             |                      |
@@ -89,16 +89,19 @@ Applicant Financial Profile
             +----------+-----------+
                        |
                        v
-             Requested EMI Comparison
+              Requested EMI Comparison
                        |
                        v
-              Final Recommendation
+                Final Recommendation
                        |
                        v
-             Database / API Response
+                Database / API Response
                        |
                        v
-              Streamlit Application
+                Streamlit Application
+```
+
+---
 
 ## 5. Machine Learning Approach
 
@@ -422,6 +425,9 @@ The deployed application was verified successfully with the frontend showing an 
 10. Prediction persistence
                     ↓
 11. Result displayed in application
+```
+
+---
 
 ## 19. Key Features
 
@@ -536,11 +542,32 @@ EMIPredict-AI/
 ├── requirements-deploy.txt
 ├── .gitignore
 └── README.md
+```
 
-Author
+---
 
-Kusuma R
+## 24. Repository
+
+GitHub Repository:
+
+**https://github.com/Kusuma-Ramesh/EMIPredict-AI**
+
+---
+
+## 25. Project Status
+
+**Completed and Deployed**
+
+The EMIPredict-AI system has been implemented, evaluated, integrated across its machine-learning, backend, database, and application components, and successfully verified in the deployed environment.
+
+---
+
+## 26. Author
+
+**Kusuma R**
 
 Individual Machine Learning Project
 
-EMIPredict-AI : AI-Powered EMI Eligibility & Affordability Intelligence
+### EMIPredict-AI
+
+**AI-Powered EMI Eligibility & Affordability Intelligence**
